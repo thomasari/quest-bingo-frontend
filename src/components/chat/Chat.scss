@@ -1,0 +1,36 @@
+@use "../../Colors.scss" as *;
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  max-width: 32rem;
+  width: 100%;
+  flex: 1;
+}
+
+.chat-log {
+  height: 14rem;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 1rem;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  flex: none; // prevent flex growth or shrink
+}
+
+.chat-message {
+  margin-bottom: 2px;
+  word-wrap: break-word;
+}
+
+.chat-sender {
+  margin-right: 4px;
+  font-weight: 600;
+}
+
+.chat-input {
+  display: flex;
+  margin-top: 4px;
+}

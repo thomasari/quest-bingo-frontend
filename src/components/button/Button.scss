@@ -1,0 +1,74 @@
+@use "../../Colors.scss" as *;
+
+.button-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.button {
+  min-height: 3rem;
+  border-radius: 8px;
+  font-size: 32px;
+  font-weight: 600;
+  width: 100%;
+  transition: background-color 0.1s ease;
+  padding: 0 1rem;
+  white-space: nowrap;
+
+  display: flex;
+  justify-content: space-between;
+
+  &.primary {
+    border: none;
+    background-color: $cyan;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: $green;
+    }
+  }
+
+  &.secondary {
+    border: 2px solid $cyan;
+    background-color: white;
+    color: $cyan;
+
+    &:hover:not(:disabled) {
+      background-color: $cyan;
+      color: white;
+    }
+  }
+
+  .button-text {
+    padding: 1rem;
+  }
+
+  &:hover {
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+  }
+
+  .material-symbols-outlined {
+    font-size: 48px !important;
+    position: relative;
+    top: 10px;
+    margin-left: -8px;
+  }
+
+  &:disabled {
+    background-color: lightgray;
+    cursor: not-allowed;
+    color: white;
+  }
+}
+
+.button-label {
+  font-weight: 500;
+  font-size: 1.25rem;
+  color: black;
+
+  &--disabled {
+    color: $cyan;
+  }
+}

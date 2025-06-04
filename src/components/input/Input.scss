@@ -1,0 +1,69 @@
+@use "../../Colors.scss" as *;
+
+.input-button-section {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.input {
+  box-sizing: border-box;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 2rem;
+  min-height: 3rem;
+  background-color: white;
+  border: none;
+  outline: 1px solid black;
+  flex: 1 1 auto; // let input grow/shrink
+  width: 100%; // ensure it fills container if no button
+  min-width: 0; // prevent overflow
+  width: 24rem;
+
+  &:focus {
+    outline: 2px solid $blue;
+  }
+
+  &:disabled {
+    color: lightgray;
+    background: white;
+    outline-color: $cyan;
+  }
+
+  &.invalid {
+    outline: 2px solid $red !important;
+  }
+}
+
+.input-label {
+  font-weight: 500;
+  font-size: 1.25rem;
+  color: black;
+
+  &--disabled {
+    color: $cyan;
+  }
+}
+
+.input-invalid-text {
+  font-size: 1rem;
+  font-weight: 400;
+  color: black;
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+
+  span {
+    font-size: 1.5rem;
+    color: $red;
+    vertical-align: top;
+    margin-right: 0.5rem;
+  }
+}

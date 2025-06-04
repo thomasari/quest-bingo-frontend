@@ -1,0 +1,13 @@
+@use "../../Colors.scss" as *;
+
+.window {
+  display: flex;
+  flex-direction: column;
+  min-width: 25%;
+  height: fit-content;
+  padding: 4rem 5rem;
+  margin: 5rem;
+  background-color: white;
+  border: 1px black solid;
+  border-radius: 30px;
+}

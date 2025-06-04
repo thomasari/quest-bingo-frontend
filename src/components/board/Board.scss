@@ -1,0 +1,32 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 16px;
+  max-width: 40rem;
+  margin: auto auto;
+}
+
+.square {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  border: 1px solid #ccc;
+  outline: 2px solid black;
+  width: 8rem;
+  height: 8rem;
+  color: black;
+  background-color: white;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #eee;
+  }
+
+  &.pressed {
+    background-color: #294086;
+    color: white;
+  }
+}
