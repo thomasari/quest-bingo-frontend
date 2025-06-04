@@ -30,7 +30,20 @@
   }
 
   &.secondary {
-    border: 2px solid $cyan;
+    border: none;
+    position: relative;
+    box-sizing: border-box;
+    outline: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 3px solid $cyan;
+      border-radius: 8px;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
     background-color: white;
     color: $cyan;
 

@@ -8,7 +8,7 @@ import { BACKEND_API_URL } from "../../../globals";
 interface Props {
   roomId: string;
   modifierClass?: string;
-  playerId?: string;
+  playerId: string | undefined;
 }
 
 function Chat({ roomId, modifierClass, playerId }: Props) {

@@ -16,7 +16,7 @@ export interface Board {
 }
 
 export interface Quest {
-  id: number;
+  id: string;
   text: string;
   completedByPlayerId: string | null;
 }

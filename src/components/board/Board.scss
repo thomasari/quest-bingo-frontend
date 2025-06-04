@@ -1,32 +1,56 @@
 .board {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  padding: 16px;
-  max-width: 40rem;
-  margin: auto auto;
 }
 
 .square {
-  font-size: 20px;
+  font-size: clamp(0.75rem, 4vw, 1.5rem);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-
-  border: 1px solid #ccc;
+  padding: 0.25rem;
+  border: none;
   outline: 2px solid black;
   width: 8rem;
   height: 8rem;
   color: black;
   background-color: white;
+  user-select: none;
+
+  /* Top-left */
+  &:first-child {
+    border-top-left-radius: 0.5rem;
+  }
+
+  /* Top-right */
+  &:nth-child(5) {
+    border-top-right-radius: 0.5rem;
+  }
+
+  /* Bottom-left */
+  &:nth-child(21) {
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  /* Bottom-right */
+  &:last-child {
+    border-bottom-right-radius: 0.5rem;
+  }
 
   &:hover {
     cursor: pointer;
-    background-color: #eee;
+
+    &:not(.clicked) {
+      background-color: #eee !important;
+    }
   }
 
-  &.pressed {
-    background-color: #294086;
-    color: white;
+  &.clicked {
+    color: #fff;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
   }
 }

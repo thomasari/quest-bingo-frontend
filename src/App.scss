@@ -6,14 +6,12 @@
   display: flex;
   justify-content: space-around;
   align-content: space-around;
-  min-height: 100vh;
 }
 
 .room-page {
   width: 100%;
   height: 100%;
-  min-height: 100vh;
-  min-width: 100vw;
+
   flex-wrap: wrap;
   margin: auto;
 }
@@ -33,6 +31,26 @@
 .room-content {
   display: flex;
   flex-direction: column;
+}
+
+.room-game-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 5rem;
+  gap: 2rem;
+}
+
+.room-game-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.room-game-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .room-player-content {
@@ -73,8 +91,6 @@
 
 .home-button {
   max-width: fit-content;
-  margin: 2rem 5rem;
-  margin-bottom: -3rem;
 }
 
 h1 {
@@ -108,6 +124,17 @@ h2 {
 
   span {
     color: $gray;
+  }
+}
+
+.player-score {
+  font-size: 3rem;
+
+  .material-symbols-outlined {
+    font-size: 4rem;
+    position: relative;
+    top: 13px;
+    margin-right: 4px;
   }
 }
 
@@ -148,12 +175,14 @@ h2 {
   outline: 1px solid black;
 }
 
-.start-game-button {
-  margin-left: 5rem;
+.button-bottom-section {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
   margin-bottom: 5rem;
-  margin-top: -3rem;
+  margin-left: 5rem;
+}
+
+.start-game-button {
   max-width: fit-content;
-  align-self: end;
-  justify-self: end;
-  justify-content: end;
 }

@@ -1,23 +1,28 @@
-import { useState, type PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 import "./Board.scss";
 
 interface Props {
   title: string;
-  color?: string;
-  onClick: React.MouseEventHandler<HTMLElement>;
+  color: string;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  isClicked?: boolean;
 }
 
-function Square({ title, color, onClick }: PropsWithChildren<Props>) {
-  const [isPressed, setIsPressed] = useState(false);
-
+function Square({
+  title,
+  color,
+  onClick,
+  isClicked,
+}: PropsWithChildren<Props>) {
   return (
     <div
       onClick={(e) => {
-        onClick(e);
-        setIsPressed((t) => !t);
+        if (onClick) onClick(e);
       }}
-      className={`square`}
-      style={{ backgroundColor: isPressed ? color : "white" }}
+      className={`square ${onClick ? "" : "disabled"} ${
+        isClicked ? "clicked" : ""
+      }`}
+      style={{ backgroundColor: color }}
     >
       {title}
     </div>

@@ -223,21 +223,12 @@ function JoinRoom({ roomId }: { roomId: string }) {
     }
   }
 
-  async function onUpdateBoard() {
-    try {
-      const response = await fetch(`${BACKEND_API_URL}/room/${roomId}/update`, {
-        method: "POST",
-        body: JSON.stringify(room),
-      });
-
-      if (!response.ok) throw new Error("Room not found");
-
-      const updatedRoom = (await response.json()) as Room;
-      setRoom(updatedRoom);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  }
+  const getScore = (p: Player) => {
+    const completedQuests = room?.board.quests
+      .flat()
+      .filter((q) => q.completedByPlayerId === p.id).length;
+    return completedQuests || 0;
+  };
 
   if (error)
     return (
@@ -258,18 +249,28 @@ function JoinRoom({ roomId }: { roomId: string }) {
   return (
     <div className="room-page">
       {room === undefined && <Window>Joining room {roomId}</Window>}
-      <Button
-        id={""}
-        text="Home"
-        onClick={() => navigate("/")}
-        icon="home"
-        type="secondary"
-        modifierClass="home-button"
-      />
       {room?.gameStarted ? (
-        <Window modifierClass="room">
-          <Board onUpdate={onUpdateBoard} room={room} player={player}></Board>
-        </Window>
+        <div className="room-game-content">
+          <Board room={room} player={player}></Board>
+          <div className="room-game-info">
+            <div className="room-game-stats">
+              {room.players.map((p) => (
+                <div key={p.id} style={{ color: p.color }}>
+                  <h1 className="player-score">
+                    <span
+                      className="name-edit-icon material-symbols-outlined"
+                      style={{ color: p.color }}
+                    >
+                      person
+                    </span>
+                    {p.name}: {getScore(p)}
+                  </h1>
+                </div>
+              ))}
+            </div>
+            <Chat roomId={roomId} playerId={player?.id}></Chat>
+          </div>
+        </div>
       ) : (
         <Window modifierClass="room">
           <div className="room-content">
@@ -326,14 +327,23 @@ function JoinRoom({ roomId }: { roomId: string }) {
           <Chat roomId={roomId} playerId={player?.id} />
         </Window>
       )}
-      {!room?.gameStarted && player?.id === room?.players?.[0]?.id && (
+      <div className="button-bottom-section">
+        {!room?.gameStarted && player?.id === room?.players?.[0]?.id && (
+          <Button
+            id={""}
+            text="Start game"
+            onClick={() => onStartGame()}
+            modifierClass="start-game-button"
+          />
+        )}
         <Button
           id={""}
-          text="Start game"
-          onClick={() => onStartGame()}
-          modifierClass="start-game-button"
+          onClick={() => navigate("/")}
+          text="Back"
+          type="secondary"
+          modifierClass="home-button"
         />
-      )}
+      </div>
     </div>
   );
 }
