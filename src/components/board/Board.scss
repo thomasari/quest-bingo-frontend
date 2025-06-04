@@ -41,7 +41,7 @@
   &:hover {
     cursor: pointer;
 
-    &:not(.clicked) {
+    &:not(.clicked, .disabled) {
       background-color: #eee !important;
     }
   }
@@ -51,6 +51,6 @@
   }
 
   &.disabled {
-    cursor: not-allowed;
+    cursor: default;
   }
 }

@@ -2,7 +2,8 @@ export interface Room {
   id: string;
   players: Player[];
   board: Board;
-  gameStarted: boolean;
+  gameStarted: string | null;
+  gameEnded: boolean;
 }
 
 export interface Player {

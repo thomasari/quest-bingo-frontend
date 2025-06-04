@@ -6,9 +6,10 @@ import { BACKEND_API_URL } from "../../../globals";
 interface Props {
   room: Room;
   player?: Player;
+  isPlaying: boolean;
 }
 
-function Board({ room, player }: Props) {
+function Board({ room, player, isPlaying }: Props) {
   async function handleSquareClick(questId: string) {
     const quest = room.board.quests.flat().find((q) => q.id === questId);
     if (!quest) return;
@@ -58,7 +59,7 @@ function Board({ room, player }: Props) {
         return (
           <Square
             onClick={
-              isTakenByOther
+              !isPlaying || isTakenByOther
                 ? undefined
                 : async () => await handleSquareClick(q.id)
             }

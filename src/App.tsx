@@ -86,6 +86,31 @@ function JoinRoom({ roomId }: { roomId: string }) {
   const [connection, setConnection] = useState<any>(null);
   const navigate = useNavigate();
 
+  const [elapsed, setElapsed] = useState("0:00:00");
+
+  useEffect(() => {
+    if (!room?.gameStarted || room.gameEnded) return;
+
+    const start = new Date(room.gameStarted).getTime();
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diff = now - start;
+
+      const hours = Math.floor(diff / 1000 / 60 / 60);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setElapsed(
+        `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+          .toString()
+          .padStart(2, "0")}`
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [room?.gameStarted, room?.gameEnded]);
+
   useEffect(() => {
     const conn = new HubConnectionBuilder()
       .withUrl(`${BACKEND_API_URL}/hub/room?roomId=${roomId}`)
@@ -223,6 +248,16 @@ function JoinRoom({ roomId }: { roomId: string }) {
     }
   }
 
+  async function onEndGame() {
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/room/${roomId}/end`);
+
+      if (!response.ok) throw new Error("Room not found");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
   const getScore = (p: Player) => {
     const completedQuests = room?.board.quests
       .flat()
@@ -251,9 +286,16 @@ function JoinRoom({ roomId }: { roomId: string }) {
       {room === undefined && <Window>Joining room {roomId}</Window>}
       {room?.gameStarted ? (
         <div className="room-game-content">
-          <Board room={room} player={player}></Board>
+          <div>
+            <Board
+              room={room}
+              player={player}
+              isPlaying={!room.gameEnded}
+            ></Board>
+          </div>
           <div className="room-game-info">
             <div className="room-game-stats">
+              <h1>{room.gameEnded ? "Game ended!" : elapsed}</h1>
               {room.players.map((p) => (
                 <div key={p.id} style={{ color: p.color }}>
                   <h1 className="player-score">
@@ -269,6 +311,28 @@ function JoinRoom({ roomId }: { roomId: string }) {
               ))}
             </div>
             <Chat roomId={roomId} playerId={player?.id}></Chat>
+            {room?.gameStarted &&
+              player?.id === room?.players?.[0]?.id &&
+              !room.gameEnded && (
+                <Button
+                  id={""}
+                  text="End game"
+                  modifierClass="end-game-button"
+                  type="secondary"
+                  icon="flag"
+                  onClick={() => onEndGame()}
+                />
+              )}
+            {room?.gameStarted && room.gameEnded && (
+              <Button
+                id={""}
+                onClick={() => navigate("/")}
+                text="Home"
+                icon="home"
+                type="primary"
+                modifierClass="end-game-button"
+              />
+            )}
           </div>
         </div>
       ) : (
@@ -336,13 +400,15 @@ function JoinRoom({ roomId }: { roomId: string }) {
             modifierClass="start-game-button"
           />
         )}
-        <Button
-          id={""}
-          onClick={() => navigate("/")}
-          text="Back"
-          type="secondary"
-          modifierClass="home-button"
-        />
+        {!room?.gameStarted && (
+          <Button
+            id={""}
+            onClick={() => navigate("/")}
+            text="Back"
+            type="secondary"
+            modifierClass="home-button"
+          />
+        )}
       </div>
     </div>
   );
