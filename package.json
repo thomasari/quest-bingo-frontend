@@ -7,14 +7,18 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "bun server.js"
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
+    "polka": "^0.5.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.1",
-    "sass": "^1.89.0"
+    "sass": "^1.89.0",
+    "serve-static": "^2.2.0",
+    "sirv": "^3.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

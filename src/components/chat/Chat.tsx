@@ -3,6 +3,7 @@ import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
 import "./Chat.scss";
 import type { ChatMessage } from "../../types/types";
 import Input from "../input/Input";
+import { BACKEND_API_URL } from "../../../globals";
 
 interface Props {
   roomId: string;
@@ -25,7 +26,7 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
 
   useEffect(() => {
     const loadChatHistory = async () => {
-      const res = await fetch(`https://localhost:7287/room/${roomId}/chat`);
+      const res = await fetch(`${BACKEND_API_URL}/room/${roomId}/chat`);
       if (res.ok) {
         const history = (await res.json()) as ChatMessage[];
         setMessages(history);
@@ -37,7 +38,7 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
 
   useEffect(() => {
     const conn = new HubConnectionBuilder()
-      .withUrl(`https://localhost:7287/hub/room?roomId=${roomId}`)
+      .withUrl(`${BACKEND_API_URL}/hub/room?roomId=${roomId}`)
       .withAutomaticReconnect()
       .build();
 

@@ -16,6 +16,7 @@ import Window from "./components/window/Window";
 import Button from "./components/button/Button";
 import Chat from "./components/chat/Chat";
 import Board from "./components/board/Board";
+import { BACKEND_API_URL } from "../globals";
 
 function Home() {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ function Home() {
 
   async function onCreateRoom() {
     try {
-      const response = await fetch("https://localhost:7287/create");
+      const response = await fetch(`${BACKEND_API_URL}/create`);
 
       if (!response.ok) {
         throw new Error("Failed to create room");
@@ -87,7 +88,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     const conn = new HubConnectionBuilder()
-      .withUrl(`https://localhost:7287/hub/room?roomId=${roomId}`)
+      .withUrl(`${BACKEND_API_URL}/hub/room?roomId=${roomId}`)
       .withAutomaticReconnect()
       .build();
 
@@ -149,7 +150,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
     async function joinRoom() {
       try {
         const getRoomResponse = await fetch(
-          `https://localhost:7287/room/${roomId}`
+          `${BACKEND_API_URL}/room/${roomId}`
         );
         if (!getRoomResponse.ok) throw new Error("Room not found");
 
@@ -164,7 +165,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
           setPlayerName(existingPlayer.name);
         } else {
           const joinRoomResponse = await fetch(
-            `https://localhost:7287/join/${roomId}`,
+            `${BACKEND_API_URL}/join/${roomId}`,
             {
               method: "POST",
             }
@@ -189,7 +190,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
   async function onSetPlayerName(newName: string) {
     try {
       const response = await fetch(
-        `https://localhost:7287/room/${roomId}/player/${player?.id}`,
+        `${BACKEND_API_URL}/room/${roomId}/player/${player?.id}`,
         {
           method: "PUT",
           headers: {
@@ -211,9 +212,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
 
   async function onStartGame() {
     try {
-      const response = await fetch(
-        `https://localhost:7287/room/${roomId}/start`
-      );
+      const response = await fetch(`${BACKEND_API_URL}/room/${roomId}/start`);
 
       if (!response.ok) throw new Error("Room not found");
 
@@ -226,13 +225,10 @@ function JoinRoom({ roomId }: { roomId: string }) {
 
   async function onUpdateBoard() {
     try {
-      const response = await fetch(
-        `https://localhost:7287/room/${roomId}/update`,
-        {
-          method: "POST",
-          body: JSON.stringify(room),
-        }
-      );
+      const response = await fetch(`${BACKEND_API_URL}/room/${roomId}/update`, {
+        method: "POST",
+        body: JSON.stringify(room),
+      });
 
       if (!response.ok) throw new Error("Room not found");
 
