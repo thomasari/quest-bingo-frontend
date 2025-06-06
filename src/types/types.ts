@@ -28,4 +28,5 @@ export interface ChatMessage {
     color: string;
   };
   message: string;
+  isSystemMessage?: boolean;
 }

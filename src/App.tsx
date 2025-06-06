@@ -286,16 +286,13 @@ function JoinRoom({ roomId }: { roomId: string }) {
       {room === undefined && <Window>Joining room {roomId}</Window>}
       {room?.gameStarted ? (
         <div className="room-game-content">
-          <div>
+          <div className="board-section">
             <Board
               room={room}
               player={player}
               isPlaying={!room.gameEnded}
             ></Board>
-          </div>
-          <div className="room-game-info">
-            <div className="room-game-stats">
-              <h1>{room.gameEnded ? "Game ended!" : elapsed}</h1>
+            <div className="room-player-scores">
               {room.players.map((p) => (
                 <div key={p.id} style={{ color: p.color }}>
                   <h1 className="player-score">
@@ -309,6 +306,13 @@ function JoinRoom({ roomId }: { roomId: string }) {
                   </h1>
                 </div>
               ))}
+            </div>
+          </div>
+          <div className="room-game-info">
+            <div className="room-game-stats">
+              <h1 className="timer">
+                {room.gameEnded ? "Game ended!" : elapsed}
+              </h1>
             </div>
             <Chat roomId={roomId} playerId={player?.id}></Chat>
             {room?.gameStarted &&

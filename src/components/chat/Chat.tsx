@@ -44,7 +44,12 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
 
     conn.on(
       "ReceiveChat",
-      (senderName: string, senderColor: string, message: string) => {
+      (
+        senderName: string,
+        isSystemMessage: boolean,
+        senderColor: string,
+        message: string
+      ) => {
         setMessages((prev) => [
           ...prev,
           {
@@ -53,6 +58,7 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
               color: senderColor,
             },
             message,
+            isSystemMessage: isSystemMessage,
           },
         ]);
       }
@@ -82,10 +88,16 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
     <div className={`chat ${modifierClass ?? ""}`}>
       <div className="chat-log" ref={chatLogRef}>
         {messages.map((m, i) => (
-          <div key={i} className="chat-message">
-            <span className="chat-sender" style={{ color: m.sender.color }}>
-              {m.sender.name}:
-            </span>{" "}
+          <div
+            key={i}
+            className={`chat-message ${m.isSystemMessage ? "system" : ""}`}
+          >
+            {!m.isSystemMessage && (
+              <span className="chat-sender" style={{ color: m.sender.color }}>
+                {`${m.sender.name}:`}
+              </span>
+            )}
+            {!m.isSystemMessage && " "}
             {m.message}
           </div>
         ))}
@@ -97,7 +109,7 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
         onClickSubmit={sendMessage}
         id="chat-input"
         buttonText="Send"
-      ></Input>
+      />
     </div>
   );
 }

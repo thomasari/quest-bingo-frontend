@@ -126,11 +126,26 @@ h2 {
   }
 }
 
+.room-player-scores {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+  margin-top: -1rem;
+}
+
+.board-section {
+  display: flex;
+  gap: 2rem;
+}
+
 .player-score {
-  font-size: 3rem;
+  font-size: 2rem;
+  width: fit-content;
+  background-color: white;
+  margin-bottom: 0.5rem;
 
   .material-symbols-outlined {
-    font-size: 4rem;
+    font-size: 3rem;
     position: relative;
     top: 13px;
     margin-right: 4px;
@@ -188,4 +203,8 @@ h2 {
 
 .end-game-button {
   margin-top: 1rem;
+}
+
+.timer {
+  font-size: 5rem;
 }
