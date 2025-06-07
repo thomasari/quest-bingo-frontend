@@ -22,10 +22,11 @@
 
   min-width: 33%;
   max-width: 70;
-  background-color: white;
-  border: 1px black solid;
+  background-color: var(--bg);
+  border: 1px var(--primary) solid;
   border-radius: 30px;
   z-index: 1001; // ensure it's above backdrop
+  color: var(--text);
 }
 
 .modal-close-button {
