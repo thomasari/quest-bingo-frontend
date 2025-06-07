@@ -50,15 +50,14 @@ function getTheme(): "light" | "dark" {
 function Home() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    applyTheme();
-  }, []);
-
   const [roomId, setRoomId] = useState("");
   const [showHowToPlayModal, setShowHowToPlayModal] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(
-    getTheme()
-  );
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    applyTheme();
+    setCurrentTheme(getTheme());
+  }, []);
 
   async function onCreateRoom() {
     try {
@@ -213,14 +212,12 @@ function JoinRoom({ roomId }: { roomId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [connection, setConnection] = useState<any>(null);
   const navigate = useNavigate();
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     applyTheme();
+    setCurrentTheme(getTheme());
   }, []);
-
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(
-    getTheme()
-  );
 
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<{
