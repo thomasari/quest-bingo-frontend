@@ -1,10 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
 :root {
-  font-family: "Roboto", Roboto, system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+  --bg-size: 40px;
+  font-family: "Roboto", sans-serif;
 }
 
 body {
+  font-family: "Roboto", sans-serif;
+
   background: white;
   background-image: radial-gradient(black 1px, transparent 0);
-  background-size: 40px 40px;
-  background-position: -19px -19px;
+  background-size: var(--bg-size) var(--bg-size);
+  animation: scroll 2s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: var(--bg-size) calc(var(--bg-size) * -1);
+  }
 }

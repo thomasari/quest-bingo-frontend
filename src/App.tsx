@@ -17,11 +17,15 @@ import Button from "./components/button/Button";
 import Chat from "./components/chat/Chat";
 import Board from "./components/board/Board";
 import { BACKEND_API_URL } from "../globals";
+import SplitText from "./components/SplitText/SplitText";
+import Modal from "./components/modal/Modal";
+import Tooltip from "./components/tooltip/Tooltip";
 
 function Home() {
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState("");
+  const [showHowToPlayModal, setShowHowToPlayModal] = useState(false);
 
   async function onCreateRoom() {
     try {
@@ -50,8 +54,20 @@ function Home() {
 
   return (
     <div className="page">
+      <SplitText
+        text="Quest Bingo"
+        className="title"
+        delay={50}
+        duration={3}
+        ease="elastic.out"
+        splitType="chars"
+        from={{ y: 40 }}
+        to={{ y: 0 }}
+        threshold={0.1}
+        rootMargin="-100px"
+        textAlign="center"
+      />
       <div className="home">
-        <h1 className="title">Quest Bingo</h1>
         <Input
           id={"room-code-input"}
           onChange={(v) => setRoomId(v.currentTarget.value.toUpperCase())}
@@ -72,7 +88,75 @@ function Home() {
           text={"Create room"}
           onClick={onCreateRoom}
         />
+        <Button
+          id="create-room-button"
+          icon="info"
+          text="How to play"
+          onClick={() => setShowHowToPlayModal(true)}
+        />
       </div>
+      {showHowToPlayModal && (
+        <Modal title="How to play" onExit={() => setShowHowToPlayModal(false)}>
+          <div className="how-to-play-content">
+            <p>
+              <strong>Quest Bingo</strong> is a multiplayer challenge game where
+              all players join a lobby and share the same quest board. Everyone
+              sees the same randomized quests, and the goal is to complete as
+              many as possible before the game ends!
+            </p>
+
+            <h3>
+              <span className="material-symbols-outlined">gavel</span>Game
+              Rules:
+            </h3>
+            <ul>
+              <li>
+                Quests can be completed in <em>any game</em> that fits the
+                description (e.g., "Kill a zombie").
+              </li>
+              <li>
+                You may only use the same game to complete{" "}
+                <strong>up to 3 quests</strong>.
+              </li>
+              <li>
+                You are encouraged to <strong>start from a new save</strong>{" "}
+                when beginning a game, to keep it fair.
+              </li>
+              <li>
+                It is <strong>not allowed</strong> to help other players
+                complete their quests.
+              </li>
+              <li>
+                Clicking a quest marks it as completed and locks it for other
+                players. You can re-open a quest by clicking again.
+              </li>
+              <li>
+                The game ends when <strong>all quests are completed</strong> or
+                the <strong>host ends the game manually</strong>.
+              </li>
+              <li>
+                The player with the most completed quests at the end wins!
+              </li>
+            </ul>
+
+            <h3>
+              <span className="material-symbols-outlined">star</span>Tips:
+            </h3>
+            <ul>
+              <li>Coordinate with others to avoid overlapping efforts.</li>
+              <li>
+                Pick games that let you efficiently complete multiple quests.
+              </li>
+              <li>Be quick — only one player can complete each quest!</li>
+              <li>
+                Optional: Take a screenshot or clip when completing a quest for
+                proof.
+              </li>
+              <li>Have fun, be creative, and embrace the chaos!</li>
+            </ul>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
@@ -85,6 +169,12 @@ function JoinRoom({ roomId }: { roomId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [connection, setConnection] = useState<any>(null);
   const navigate = useNavigate();
+
+  const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
 
   const [elapsed, setElapsed] = useState("0:00:00");
 
@@ -265,6 +355,13 @@ function JoinRoom({ roomId }: { roomId: string }) {
     return completedQuests || 0;
   };
 
+  function onCopyRoom(e: React.MouseEvent) {
+    navigator.clipboard.writeText(roomId);
+    setShowCopyTooltip(true);
+    setTimeout(() => setShowCopyTooltip(false), 3000);
+    setTooltipPosition({ x: e.clientX, y: e.clientY });
+  }
+
   if (error)
     return (
       <div className="room-page">
@@ -283,8 +380,9 @@ function JoinRoom({ roomId }: { roomId: string }) {
 
   return (
     <div className="room-page">
-      {room === undefined && <Window>Joining room {roomId}</Window>}
-      {room?.gameStarted ? (
+      {room === undefined ? (
+        <div>Joining room {roomId}</div>
+      ) : room?.gameStarted ? (
         <div className="room-game-content">
           <div className="board-section">
             <Board
@@ -342,78 +440,83 @@ function JoinRoom({ roomId }: { roomId: string }) {
       ) : (
         <Window modifierClass="room">
           <div className="room-content">
-            <h1 className="title">
+            <h1 className="room-title">
               Room{" "}
               <span
                 style={{ color: player?.color, cursor: "pointer" }}
-                onClick={() => navigator.clipboard.writeText(roomId)}
+                onClick={(e) => onCopyRoom(e)}
               >
                 {roomId}
                 <span className="title-icon material-symbols-outlined">
                   content_copy
                 </span>
               </span>
+              {showCopyTooltip && (
+                <Tooltip x={tooltipPosition.x} y={tooltipPosition.y}>
+                  Copied to clipboard!
+                </Tooltip>
+              )}
             </h1>
-            <div className="player-section">
-              <div className="player-list">
-                {room?.players.map((p) => {
-                  const isHost = p.id === room.players[0].id;
-                  const isYou = p.id === player?.id;
+            <div className="player-list">
+              {room?.players.map((p) => {
+                const isHost = p.id === room.players[0].id;
+                const isYou = p.id === player?.id;
 
-                  return (
+                return (
+                  <span
+                    className="player"
+                    key={p.id}
+                    style={{ color: p.color }}
+                  >
                     <span
-                      className="player"
-                      key={p.id}
+                      className="name-edit-icon material-symbols-outlined"
                       style={{ color: p.color }}
                     >
-                      <span
-                        className="name-edit-icon material-symbols-outlined"
-                        style={{ color: p.color }}
-                      >
-                        person
-                      </span>
-                      {p.name}
-                      {isYou && <span> (you)</span>}
-                      {!isYou && isHost && <span> (host)</span>}
+                      person
                     </span>
-                  );
-                })}
-              </div>
-              <Input
-                label={"Player name"}
-                id={"123"}
-                onChange={(e) => setPlayerName(e.currentTarget.value)}
-                value={playerName}
-                invalidText={validatePlayerName(playerName)}
-                onKeySubmit={() => onSetPlayerName(playerName)}
-                onClickSubmit={() => onSetPlayerName(playerName)}
-                buttonText="Change"
-                buttonDisabled={player?.name === playerName}
-              />
+                    {p.name}
+                    {isYou && <span> (you)</span>}
+                    {!isYou && isHost && <span> (host)</span>}
+                  </span>
+                );
+              })}
             </div>
+            <Input
+              label={"Player name"}
+              id={"123"}
+              onChange={(e) => setPlayerName(e.currentTarget.value)}
+              value={playerName}
+              invalidText={validatePlayerName(playerName)}
+              onKeySubmit={() => onSetPlayerName(playerName)}
+              onClickSubmit={() => onSetPlayerName(playerName)}
+              buttonText="Change"
+              buttonDisabled={player?.name === playerName}
+            />
           </div>
           <Chat roomId={roomId} playerId={player?.id} />
         </Window>
       )}
-      <div className="button-bottom-section">
-        {!room?.gameStarted && player?.id === room?.players?.[0]?.id && (
-          <Button
-            id={""}
-            text="Start game"
-            onClick={() => onStartGame()}
-            modifierClass="start-game-button"
-          />
-        )}
-        {!room?.gameStarted && (
-          <Button
-            id={""}
-            onClick={() => navigate("/")}
-            text="Back"
-            type="secondary"
-            modifierClass="home-button"
-          />
-        )}
-      </div>
+      {room !== undefined && (
+        <div className="button-bottom-section">
+          {!room?.gameStarted && player?.id === room?.players?.[0]?.id && (
+            <Button
+              id={""}
+              text="Start game"
+              onClick={() => onStartGame()}
+              modifierClass="start-game-button"
+            />
+          )}
+          {!room?.gameStarted && (
+            <Button
+              id={""}
+              onClick={() => navigate("/")}
+              text="Back"
+              type="secondary"
+              modifierClass="home-button"
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,10 +5,13 @@
   flex-direction: column;
   max-width: 32rem;
   width: 100%;
+  justify-content: end;
 }
 
 .chat-log {
-  height: 14rem;
+  height: 100%;
+  min-height: 14rem;
+  max-height: 20rem;
   overflow-y: auto;
   padding-right: 4px;
   margin-bottom: 1rem;
@@ -16,7 +19,6 @@
   border: 1px solid black;
   border-radius: 0.5rem;
   padding: 1rem;
-  flex: none; // prevent flex growth or shrink
 }
 
 .chat-message {

@@ -1,11 +1,14 @@
 @use "./Colors.scss" as *;
+@import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
 
 .page {
-  width: 100%;
+  width: fit-content;
   height: 100% !important;
   display: flex;
-  justify-content: space-around;
-  align-content: space-around;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
 }
 
 .room-page {
@@ -31,6 +34,7 @@
 .room-content {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 .room-game-content {
@@ -75,9 +79,9 @@
   flex-direction: column;
   gap: 1rem;
   min-width: 25%;
+  width: 32rem;
   height: fit-content;
   padding: 3rem;
-  margin-top: 12rem;
   background-color: white;
   border: 1px black solid;
   border-radius: 30px;
@@ -99,10 +103,30 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.title {
+  font-family: "Jersey 25", "Noto Serif", sans-serif !important;
+
+  text-align: center;
+  font-size: 10rem;
+  font-weight: 600;
+  margin: 4rem;
+  color: $cyan;
+}
+
 h2 {
   font-size: 32px;
   margin: 0;
   padding: 0;
+}
+
+h3 {
+  margin: 0;
+  .material-symbols-outlined {
+    font-size: 2rem;
+    position: relative;
+    top: 7px;
+    margin-right: 4px;
+  }
 }
 
 .title-icon {
@@ -176,6 +200,8 @@ h2 {
   width: 100%;
   text-align: center;
   font-size: 2rem;
+  font-family: "Jersey 25", "Noto Serif", sans-serif !important;
+  color: $cyan;
 }
 
 .playername {
