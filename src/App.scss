@@ -229,6 +229,7 @@ h3 {
 
 .end-game-button {
   margin-top: 1rem;
+  width: 100%;
 }
 
 .timer {
@@ -240,4 +241,10 @@ h3 {
   top: 1rem;
   right: 1rem;
   z-index: 1000;
+}
+
+.end-game-buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
 }

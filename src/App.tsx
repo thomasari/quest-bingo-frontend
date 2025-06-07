@@ -397,6 +397,19 @@ function JoinRoom({ roomId }: { roomId: string }) {
     }
   }
 
+  async function onRestartGame() {
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/room/${roomId}/restart`);
+
+      if (!response.ok) throw new Error("Room not found");
+
+      const newRoom = (await response.json()) as Room;
+      setRoom(newRoom);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
   const getScore = (p: Player) => {
     const completedQuests = room?.board.quests
       .flat()
@@ -484,14 +497,26 @@ function JoinRoom({ roomId }: { roomId: string }) {
                 />
               )}
             {room?.gameStarted && room.gameEnded && (
-              <Button
-                id={""}
-                onClick={() => navigate("/")}
-                text="Home"
-                icon="home"
-                type="primary"
-                modifierClass="end-game-button"
-              />
+              <div className="end-game-buttons">
+                {player?.id === room?.players?.[0]?.id && (
+                  <Button
+                    id={""}
+                    onClick={() => onRestartGame()}
+                    text="Back to lobby"
+                    icon="arrow_right_alt"
+                    type="primary"
+                    modifierClass="end-game-button"
+                  />
+                )}
+                <Button
+                  id={""}
+                  onClick={() => navigate("/")}
+                  text="Home"
+                  icon="home"
+                  type="secondary"
+                  modifierClass="end-game-button"
+                />
+              </div>
             )}
           </div>
         </div>
