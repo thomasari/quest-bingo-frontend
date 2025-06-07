@@ -82,8 +82,8 @@
   width: 32rem;
   height: fit-content;
   padding: 3rem;
-  background-color: white;
-  border: 1px black solid;
+  background-color: var(--bg);
+  border: 1px var(--primary) solid;
   border-radius: 30px;
 }
 
@@ -110,7 +110,7 @@ h1 {
   font-size: 10rem;
   font-weight: 600;
   margin: 4rem;
-  color: $cyan;
+  color: var(--primary);
 }
 
 h2 {
@@ -165,7 +165,7 @@ h3 {
 .player-score {
   font-size: 2rem;
   width: fit-content;
-  background-color: white;
+  background-color: var(--bg);
   margin-bottom: 0.5rem;
 
   .material-symbols-outlined {
@@ -177,7 +177,7 @@ h3 {
 }
 
 .name-edit-icon {
-  color: $cyan;
+  color: var(--primary);
 }
 
 .join-section {
@@ -201,7 +201,7 @@ h3 {
   text-align: center;
   font-size: 2rem;
   font-family: "Jersey 25", "Noto Serif", sans-serif !important;
-  color: $cyan;
+  color: var(--primary);
 }
 
 .playername {
@@ -233,4 +233,11 @@ h3 {
 
 .timer {
   font-size: 5rem;
+}
+
+.theme-switch {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
 }

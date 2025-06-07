@@ -21,11 +21,11 @@
 
   &.primary {
     border: none;
-    background-color: $cyan;
-    color: white;
+    background-color: var(--primary);
+    color: var(--text-on-primary);
 
     &:hover:not(:disabled) {
-      background-color: $green;
+      background-color: var(--secondary);
     }
   }
 
@@ -39,17 +39,17 @@
       content: "";
       position: absolute;
       inset: 0;
-      border: 3px solid $cyan;
+      border: 3px solid var(--primary);
       border-radius: 8px;
       pointer-events: none;
       box-sizing: border-box;
     }
-    background-color: white;
-    color: $cyan;
+    background-color: var(--bg);
+    color: var(--primary);
 
     &:hover:not(:disabled) {
-      background-color: $cyan;
-      color: white;
+      background-color: var(--primary);
+      color: var(--text-on-primary);
     }
   }
 
@@ -72,16 +72,16 @@
   &:disabled {
     background-color: lightgray;
     cursor: not-allowed;
-    color: white;
+    color: var(--gray);
   }
 }
 
 .button-label {
   font-weight: 500;
   font-size: 1.25rem;
-  color: black;
+  color: var(--text);
 
   &--disabled {
-    color: $cyan;
+    color: gray;
   }
 }

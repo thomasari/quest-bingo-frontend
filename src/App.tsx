@@ -20,12 +20,40 @@ import { BACKEND_API_URL } from "../globals";
 import SplitText from "./components/SplitText/SplitText";
 import Modal from "./components/modal/Modal";
 import Tooltip from "./components/tooltip/Tooltip";
+import Switch from "./components/switch/Switch";
+
+function applyTheme() {
+  let theme = sessionStorage.getItem("theme");
+
+  if (!theme) {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    theme = prefersDark ? "dark" : "light";
+    sessionStorage.setItem("theme", theme);
+  }
+
+  document.documentElement.setAttribute("data-theme", theme);
+}
+
+function setTheme(theme: "light" | "dark") {
+  document.documentElement.setAttribute("data-theme", theme);
+  sessionStorage.setItem("theme", theme);
+}
+
+function getTheme(): "light" | "dark" {
+  return (document.documentElement.getAttribute("data-theme") ||
+    (sessionStorage.getItem("theme") as "light" | "dark")) as "light" | "dark";
+}
 
 function Home() {
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState("");
   const [showHowToPlayModal, setShowHowToPlayModal] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(
+    getTheme()
+  );
 
   async function onCreateRoom() {
     try {
@@ -54,6 +82,15 @@ function Home() {
 
   return (
     <div className="page">
+      <Switch
+        modifierClass="theme-switch"
+        id={"theme-switch"}
+        checked={currentTheme === "dark"}
+        onChange={() => {
+          setTheme(currentTheme === "dark" ? "light" : "dark");
+          setCurrentTheme(getTheme());
+        }}
+      />
       <SplitText
         text="Quest Bingo"
         className="title"
@@ -69,6 +106,7 @@ function Home() {
       />
       <div className="home">
         <Input
+          placeholder="Room code"
           id={"room-code-input"}
           onChange={(v) => setRoomId(v.currentTarget.value.toUpperCase())}
           value={roomId}
@@ -93,6 +131,7 @@ function Home() {
           icon="info"
           text="How to play"
           onClick={() => setShowHowToPlayModal(true)}
+          type="secondary"
         />
       </div>
       {showHowToPlayModal && (
@@ -170,11 +209,17 @@ function JoinRoom({ roomId }: { roomId: string }) {
   const [connection, setConnection] = useState<any>(null);
   const navigate = useNavigate();
 
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(
+    getTheme()
+  );
+
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<{
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
+
+  applyTheme();
 
   const [elapsed, setElapsed] = useState("0:00:00");
 
@@ -380,6 +425,15 @@ function JoinRoom({ roomId }: { roomId: string }) {
 
   return (
     <div className="room-page">
+      <Switch
+        modifierClass="theme-switch"
+        id={"theme-switch"}
+        checked={currentTheme === "dark"}
+        onChange={() => {
+          setTheme(currentTheme === "dark" ? "light" : "dark");
+          setCurrentTheme(getTheme());
+        }}
+      />
       {room === undefined ? (
         <div>Joining room {roomId}</div>
       ) : room?.gameStarted ? (
@@ -443,7 +497,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
             <h1 className="room-title">
               Room{" "}
               <span
-                style={{ color: player?.color, cursor: "pointer" }}
+                style={{ color: "var(--primary)", cursor: "pointer" }}
                 onClick={(e) => onCopyRoom(e)}
               >
                 {roomId}

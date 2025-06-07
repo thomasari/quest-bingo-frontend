@@ -19,22 +19,23 @@
   padding: 0.5rem 1rem;
   font-size: 2rem;
   min-height: 3rem;
-  background-color: white;
+  background-color: var(--bg);
+  color: var(--text);
   border: none;
-  outline: 1px solid black;
+  outline: 1px solid var(--text);
   flex: 1 1 auto; // let input grow/shrink
   width: 100%; // ensure it fills container if no button
   min-width: 0; // prevent overflow
   width: 24rem;
 
   &:focus {
-    outline: 2px solid $blue;
+    outline: 2px solid var(--primary);
   }
 
   &:disabled {
-    color: lightgray;
-    background: white;
-    outline-color: $cyan;
+    color: var(--text);
+    background: var(--gray);
+    outline-color: var(--primary);
   }
 
   &.invalid {
@@ -45,17 +46,17 @@
 .input-label {
   font-weight: 500;
   font-size: 1.25rem;
-  color: black;
+  color: var(--text);
 
   &--disabled {
-    color: $cyan;
+    color: var(--text);
   }
 }
 
 .input-invalid-text {
   font-size: 1rem;
   font-weight: 400;
-  color: black;
+  color: var(--text);
   display: flex;
   align-items: center;
   margin-top: 0.5rem;

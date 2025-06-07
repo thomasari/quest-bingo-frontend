@@ -14,6 +14,7 @@ interface Props {
   onClickSubmit?: React.MouseEventHandler<HTMLButtonElement>;
   buttonText?: string;
   buttonIcon?: string;
+  placeholder?: string;
   buttonDisabled?: boolean;
   buttonType?: "primary" | "secondary";
   maxLength?: number;
@@ -31,6 +32,7 @@ function Input({
   buttonIcon,
   modifierClass,
   value,
+  placeholder,
   disabled,
   invalidText,
   maxLength,
@@ -53,6 +55,7 @@ function Input({
           value={value ?? ""}
           disabled={disabled}
           maxLength={maxLength}
+          placeholder={placeholder}
         ></input>
         {onClickSubmit && buttonText && (
           <Button

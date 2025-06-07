@@ -3,13 +3,29 @@
 :root {
   --bg-size: 40px;
   font-family: "Roboto", sans-serif;
+  --bg: #ffffff;
+  --text: #000000;
+  --gray: #b0b0b0;
+  --primary: hsl(200, 60%, 40%); /* blå-ish */
+  --secondary: color-mix(in srgb, var(--primary) 70%, black 30%);
+  --text-on-primary: #ffffff;
+}
+
+[data-theme="dark"] {
+  --bg: #121212;
+  --text: #f5f5f5;
+  --gray: #888888;
+  --primary: hsl(45, 100%, 60%); /* gul-ish */
+  --secondary: color-mix(in srgb, var(--primary) 70%, black 30%);
+  --text-on-primary: #000000;
 }
 
 body {
   font-family: "Roboto", sans-serif;
 
-  background: white;
-  background-image: radial-gradient(black 1px, transparent 0);
+  background-color: var(--bg);
+  color: var(--text);
+  background-image: radial-gradient(var(--text) 1px, transparent 0);
   background-size: var(--bg-size) var(--bg-size);
   animation: scroll 2s linear infinite;
 }

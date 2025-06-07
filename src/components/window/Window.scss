@@ -7,7 +7,7 @@
   height: fit-content;
   padding: 4rem 5rem;
   margin: 5rem;
-  background-color: white;
-  border: 1px black solid;
+  background-color: var(--bg);
+  border: 1px var(--primary) solid;
   border-radius: 30px;
 }

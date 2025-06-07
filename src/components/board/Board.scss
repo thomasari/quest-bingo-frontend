@@ -11,11 +11,11 @@
   text-align: center;
   padding: 0.25rem;
   border: none;
-  outline: 2px solid black;
+  outline: 2px solid var(--text);
   width: 8rem;
   height: 8rem;
-  color: black;
-  background-color: white;
+  color: var(--text);
+  background-color: var(--bg);
   user-select: none;
 
   /* Top-left */
@@ -42,12 +42,12 @@
     cursor: pointer;
 
     &:not(.clicked, .disabled) {
-      background-color: #eee !important;
+      background-color: var(--gray) !important;
     }
   }
 
   &.clicked {
-    color: #fff;
+    color: white;
   }
 
   &.disabled {

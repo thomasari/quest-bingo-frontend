@@ -44,9 +44,9 @@ function Board({ room, player, isPlaying }: Props) {
   }
 
   function getColorFromPlayer(playerId: string | null): string {
-    if (!playerId) return "white";
+    if (!playerId) return "var(--bg)";
     const playerColor = room.players.find((p) => p.id === playerId)?.color;
-    return playerColor || "white";
+    return playerColor || "var(--bg)";
   }
 
   return (
