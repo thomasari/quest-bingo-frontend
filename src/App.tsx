@@ -43,11 +43,16 @@ function setTheme(theme: "light" | "dark") {
 
 function getTheme(): "light" | "dark" {
   return (document.documentElement.getAttribute("data-theme") ||
-    (sessionStorage.getItem("theme") as "light" | "dark")) as "light" | "dark";
+    (sessionStorage.getItem("theme") as "light" | "dark") ||
+    "light") as "light" | "dark";
 }
 
 function Home() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    applyTheme();
+  }, []);
 
   const [roomId, setRoomId] = useState("");
   const [showHowToPlayModal, setShowHowToPlayModal] = useState(false);
@@ -209,6 +214,10 @@ function JoinRoom({ roomId }: { roomId: string }) {
   const [connection, setConnection] = useState<any>(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    applyTheme();
+  }, []);
+
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(
     getTheme()
   );
@@ -218,8 +227,6 @@ function JoinRoom({ roomId }: { roomId: string }) {
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
-
-  applyTheme();
 
   const [elapsed, setElapsed] = useState("0:00:00");
 
