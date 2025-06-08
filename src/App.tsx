@@ -219,6 +219,8 @@ function JoinRoom({ roomId }: { roomId: string }) {
     setCurrentTheme(getTheme());
   }, []);
 
+  const [gameIsStarting, setGameIsStarting] = useState(false);
+
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState<{
     x: number;
@@ -375,6 +377,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
   }
 
   async function onStartGame() {
+    setGameIsStarting(true);
     try {
       const response = await fetch(`${BACKEND_API_URL}/room/${roomId}/start`);
 
@@ -382,6 +385,7 @@ function JoinRoom({ roomId }: { roomId: string }) {
 
       const updatedRoom = (await response.json()) as Room;
       setRoom(updatedRoom);
+      setGameIsStarting(false);
     } catch (err: any) {
       setError(err.message);
     }
@@ -584,9 +588,10 @@ function JoinRoom({ roomId }: { roomId: string }) {
           {!room?.gameStarted && player?.id === room?.players?.[0]?.id && (
             <Button
               id={""}
-              text="Start game"
+              text={gameIsStarting ? "Starting..." : "Start game"}
               onClick={() => onStartGame()}
               modifierClass="start-game-button"
+              disabled={gameIsStarting}
             />
           )}
           {!room?.gameStarted && (
