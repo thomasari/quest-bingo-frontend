@@ -1,26 +1,28 @@
 import "./Button.scss";
 
 interface Props {
-  id: string;
   label?: string;
   text: string;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
   modifierClass?: string;
   disabled?: boolean;
   invalidText?: string | null;
+  submit?: boolean;
   icon?: string;
-  type?: "primary" | "secondary";
+  type?: "primary" | "secondary" | "tertiary";
+  isLoading?: boolean;
 }
 
 function Button({
-  id,
   label,
   text,
   onClick,
   modifierClass,
   disabled,
   invalidText,
+  submit,
   icon,
+  isLoading,
   type = "primary",
 }: Props) {
   return (
@@ -28,7 +30,6 @@ function Button({
       {label && (
         <label
           className={`button-label ${disabled ? "button-label--disabled" : ""}`}
-          htmlFor={id}
         >
           {label}
         </label>
@@ -36,15 +37,19 @@ function Button({
 
       <button
         className={`button ${type} ${invalidText ? "invalid" : ""}`}
-        type="button"
+        type={submit ? "submit" : "button"}
         onClick={onClick}
         disabled={disabled}
       >
-        <span className="button-text">{text}</span>
-        {icon && <span className="material-symbols-outlined">{icon}</span>}
+        {text && <span className="button-text">{text}</span>}
+        {icon && (
+          <span className="material-symbols-outlined">
+            {isLoading ? "hourglass_empty" : icon}
+          </span>
+        )}
       </button>
       {invalidText && (
-        <label className="button-invalid-text" htmlFor={id}>
+        <label className="button-invalid-text">
           <span className="material-symbols-outlined">warning</span>
           {invalidText}
         </label>

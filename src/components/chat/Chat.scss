@@ -1,5 +1,3 @@
-@use "../../Colors.scss" as *;
-
 .chat {
   display: flex;
   flex-direction: column;
@@ -30,7 +28,6 @@
 
 .system {
   font-weight: bold;
-  color: #999;
 }
 
 .chat-sender {
@@ -41,4 +38,9 @@
 .chat-input {
   display: flex;
   margin-top: 4px;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 0.5rem;
 }

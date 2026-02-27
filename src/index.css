@@ -6,15 +6,21 @@
   --bg: #ffffff;
   --text: #000000;
   --gray: #b0b0b0;
-  --primary: hsl(200, 60%, 40%); /* blå-ish */
+  --primary: #297aa3; /* blå-ish */
   --secondary: color-mix(in srgb, var(--primary) 70%, black 30%);
+  --tertiary: color-mix(in srgb, var(--primary) 50%, white 50%);
   --text-on-primary: #ffffff;
+  --correct: #2e9e5b;
 
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   /* For alle elementer som bruker CSS-variabler */
   * {
-    transition: background-color 0.2s ease, color 0.2s ease,
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
       border-color 0.2s ease;
   }
 }
@@ -23,9 +29,11 @@
   --bg: #121212;
   --text: #f5f5f5;
   --gray: #888888;
-  --primary: hsl(45, 100%, 60%); /* gul-ish */
+  --primary: #ffcc33; /* gul-ish */
   --secondary: color-mix(in srgb, var(--primary) 70%, black 30%);
+  --tertiary: color-mix(in srgb, var(--primary) 50%, white 50%);
   --text-on-primary: #000000;
+  --correct: #2e9e5b;
 }
 
 body {
@@ -36,6 +44,8 @@ body {
   background-image: radial-gradient(var(--text) 1px, transparent 0);
   background-size: var(--bg-size) var(--bg-size);
   animation: scroll 2s linear infinite;
+  margin: 0;
+  height: 100vh;
 }
 
 @keyframes scroll {
@@ -45,4 +55,10 @@ body {
   100% {
     background-position: var(--bg-size) calc(var(--bg-size) * -1);
   }
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }

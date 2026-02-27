@@ -1,88 +1,51 @@
 import { useEffect, useRef, useState } from "react";
-import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
 import "./Chat.scss";
-import type { ChatMessage } from "../../types/types";
+import type { ChatMessage, Player, RoomDto } from "../../types/types";
 import Input from "../input/Input";
-import { BACKEND_API_URL } from "../../../globals";
+import Button from "../button/Button";
 
 interface Props {
-  roomId: string;
+  room: RoomDto;
+  player: Player;
+  messages: ChatMessage[];
+  sendMessage: (message: string) => void;
   modifierClass?: string;
-  playerId: string | undefined;
 }
 
-function Chat({ roomId, modifierClass, playerId }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+function Chat({ room, player, messages, sendMessage, modifierClass }: Props) {
   const [newMessage, setNewMessage] = useState("");
-  const [connection, setConnection] = useState<HubConnection | null>(null);
-
   const chatLogRef = useRef<HTMLDivElement>(null);
 
+  /* Auto-scroll */
   useEffect(() => {
     if (chatLogRef.current) {
       chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
     }
   }, [messages]);
 
-  useEffect(() => {
-    const loadChatHistory = async () => {
-      const res = await fetch(`${BACKEND_API_URL}/room/${roomId}/chat`);
-      if (res.ok) {
-        const history = (await res.json()) as ChatMessage[];
-        setMessages(history);
-      }
-    };
-
-    loadChatHistory();
-  }, [roomId]);
-
-  useEffect(() => {
-    const conn = new HubConnectionBuilder()
-      .withUrl(`${BACKEND_API_URL}/hub/room?roomId=${roomId}`)
-      .withAutomaticReconnect()
-      .build();
-
-    conn.on(
-      "ReceiveChat",
-      (
-        senderName: string,
-        isSystemMessage: boolean,
-        senderColor: string,
-        message: string
-      ) => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: {
-              name: senderName,
-              color: senderColor,
-            },
-            message,
-            isSystemMessage: isSystemMessage,
-          },
-        ]);
-      }
-    );
-
-    conn.start().then(() => setConnection(conn));
-
-    return () => {
-      conn.stop();
-    };
-  }, [roomId]);
-
-  async function sendMessage() {
-    if (
-      newMessage.trim().length === 0 ||
-      !connection ||
-      connection.state !== "Connected" ||
-      playerId === undefined
-    )
-      return;
-
-    await connection.invoke("SendChat", roomId, playerId, newMessage);
+  function handleSend() {
+    if (newMessage.trim().length === 0) return;
+    sendMessage(newMessage);
     setNewMessage("");
   }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSend();
+    }
+  }
+
+  const currentRound = room.game?.currentRound;
+
+  const hasGuessed =
+    currentRound &&
+    currentRound.playerScores &&
+    player.id in currentRound.playerScores;
+
+  const disabled =
+    ((room.game?.currentRound?.state === "Playing" && hasGuessed) ?? false) ||
+    room.game?.currentRound?.state === "Intermission";
 
   return (
     <div className={`chat ${modifierClass ?? ""}`}>
@@ -91,10 +54,11 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
           <div
             key={i}
             className={`chat-message ${m.isSystemMessage ? "system" : ""}`}
+            style={m.isSystemMessage ? { color: m.sender.color } : {}}
           >
             {!m.isSystemMessage && (
               <span className="chat-sender" style={{ color: m.sender.color }}>
-                {`${m.sender.name}:`}
+                {m.sender.name}:
               </span>
             )}
             {!m.isSystemMessage && " "}
@@ -102,14 +66,21 @@ function Chat({ roomId, modifierClass, playerId }: Props) {
           </div>
         ))}
       </div>
-      <Input
-        onChange={(e) => setNewMessage(e.target.value)}
-        value={newMessage}
-        onKeySubmit={sendMessage}
-        onClickSubmit={sendMessage}
-        id="chat-input"
-        buttonText="Send"
-      />
+
+      <div className="chat-input-area">
+        <Input
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+        />
+
+        <Button
+          text={room.game?.currentRound?.state === "Playing" ? "Gjett" : "Send"}
+          onClick={handleSend}
+          disabled={disabled}
+        />
+      </div>
     </div>
   );
 }

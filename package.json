@@ -1,5 +1,5 @@
 {
-  "name": "quest-bingo-frontend",
+  "name": "gjettlata",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,11 +8,14 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "bun server.js"
+    "start": "bun server.js",
+    "deploy": "sh ./deploy.sh"
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
+    "@uiw/react-color": "^2.9.5",
     "gsap": "^3.13.0",
+    "motion": "^12.34.3",
     "polka": "^0.5.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
