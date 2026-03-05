@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./components/button/Button";
 import Input from "./components/input/Input";
 import Modal from "./components/modal/Modal";
@@ -15,6 +15,11 @@ export default function Home() {
     useAppContext();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setPlayer(null);
+    setCurrentRoom(null);
+  }, [setCurrentRoom, setPlayer]);
 
   async function onCreateRoom() {
     setIsLoading(true);
@@ -93,7 +98,31 @@ export default function Home() {
           title="Hvordan spille"
           onExit={() => setShowHowToPlayModal(false)}
         >
-          <div className="how-to-play-content">hei</div>
+          <div className="how-to-play-content">
+            <b>Opprett eller bli med</b>
+            <p>
+              For å starte spillet, kan du enten opprette et nytt rom eller bli
+              med i et eksisterende rom ved å bruke en kode.
+            </p>
+            <b>Spilleregler</b>
+            <p>
+              Når spillet starter, vil en sang begynne å spille, og du må gjette
+              sangens tittel så raskt som mulig. Skriv inn gjetningen din i
+              chatten og send den inn. Jo raskere du gjetter riktig, desto flere
+              poeng får du!
+            </p>
+            <b>Runder og poeng</b>
+            <p>
+              Spillet består av 16 runder, og hver runde varer i 30 sekunder.
+              Poengene dine vil bli oppdatert etter hver runde basert på hvor
+              raskt du gjetter riktig.
+            </p>
+            <b>Vinn spillet</b>
+            <p>
+              Etter et forhåndsbestemt antall runder, vil spilleren med flest
+              poeng bli kåret til vinneren!
+            </p>
+          </div>
         </Modal>
       )}
     </div>

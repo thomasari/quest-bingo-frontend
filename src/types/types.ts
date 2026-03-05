@@ -11,6 +11,7 @@ export interface GameDto {
   ended: boolean;
   currentRoundIndex: number;
   currentRound: RoundDto | null;
+  totalRounds: number;
 }
 
 export interface RoundDto {

@@ -46,7 +46,7 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
   function getTheme(): "light" | "dark" {
     return (document.documentElement.getAttribute("data-theme") ||
       (sessionStorage.getItem("theme") as "light" | "dark") ||
-      "light") as "light" | "dark";
+      "dark") as "light" | "dark";
   }
 
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(

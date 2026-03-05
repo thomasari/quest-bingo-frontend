@@ -106,3 +106,45 @@ export async function setGamemode(
     return false;
   }
 }
+
+/* ============================= */
+/* SET ROUNDS */
+/* ============================= */
+
+export async function setRounds(
+  roomId: string,
+  rounds: number,
+): Promise<boolean> {
+  try {
+    const res = await fetch(`${BACKEND_API_URL}/room/${roomId}/rounds`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(rounds),
+    });
+
+    return res.ok;
+  } catch (err) {
+    console.error("Set rounds failed:", err);
+    return false;
+  }
+}
+
+/* ============================= */
+/* RESTART GAME */
+/* ============================= */
+
+export async function restartGame(roomId: string): Promise<RoomDto | null> {
+  try {
+    const res = await fetch(`${BACKEND_API_URL}/room/${roomId}/restart`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Failed to restart game");
+
+    const room: RoomDto = await res.json();
+    return room?.id ? room : null;
+  } catch (err) {
+    console.error("Start game failed:", err);
+    return null;
+  }
+}

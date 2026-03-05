@@ -24,6 +24,7 @@
 .chat-message {
   margin-bottom: 2px;
   word-wrap: break-word;
+  paint-order: stroke fill;
 }
 
 .system {

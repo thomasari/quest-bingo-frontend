@@ -1,6 +1,7 @@
 import "./PlayerCard.scss";
 import type { Player } from "../../types/types";
 import { isBrightColor } from "../../utils/helpers";
+import { useAppContext } from "../../context/context";
 
 interface PlayerCardProps {
   player: Player;
@@ -15,10 +16,14 @@ function PlayerCard({
   small,
   isCorrectGuess,
 }: PlayerCardProps) {
-  const isBright = isBrightColor(player.color);
-  const shadowStyle = isBright ? { ["-webkit-text-stroke"]: "0.5px #000" } : {};
+  const { currentTheme } = useAppContext();
+  const isBright = isBrightColor(player.color) && currentTheme === "light";
+
+  const shadowStyle = isBright ? { ["-webkit-text-stroke"]: "2px #000" } : {};
   const outlineStyle = isBright
-    ? { outline: "0.5px solid #000, -0.5px solid #000" }
+    ? {
+        outline: "1px solid #000",
+      }
     : {};
 
   return (

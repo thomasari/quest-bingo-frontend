@@ -2,7 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import Button from "./components/button/Button";
 import Input from "./components/input/Input";
 import { useAppContext } from "./context/context";
-import { getRoom, joinRoom, setGamemode, startGame } from "./api";
+import {
+  getRoom,
+  joinRoom,
+  restartGame,
+  setGamemode,
+  setRounds,
+  startGame,
+} from "./api";
 import "./Room.scss";
 import Chat from "./components/chat/Chat";
 import { Hue } from "@uiw/react-color";
@@ -14,6 +21,8 @@ import { useParams } from "react-router-dom";
 import useRoomSignalR from "./useRoomSignalR";
 import { motion } from "motion/react";
 import Tooltip from "./components/tooltip/Tooltip";
+import { Textfit } from "react-textfit";
+import { isBrightColor } from "./utils/helpers";
 
 const GamemodeOptions = [
   { value: "AllTime", label: "Alle tidsaldre" },
@@ -25,10 +34,38 @@ const GamemodeOptions = [
   { value: "TwentyTwenties", label: "2020-tallet" },
 ];
 
+const RoundOptions = [
+  { value: 5, label: "5 runder" },
+  { value: 10, label: "10 runder" },
+  { value: 15, label: "15 runder" },
+  { value: 20, label: "20 runder" },
+  { value: 25, label: "25 runder" },
+  { value: 30, label: "30 runder" },
+];
+
+const dummyPlayers = [
+  { id: "1", name: "Alice", color: "#ff0000", score: 10 },
+  { id: "2", name: "Bob", color: "#00ff00", score: 20 },
+  { id: "3", name: "Charlie", color: "#0000ff", score: 15 },
+  { id: "12", name: "Alice", color: "#ff0000", score: 10 },
+  { id: "23", name: "Bob", color: "#00ff00", score: 20 },
+  { id: "34", name: "Charlie", color: "#0000ff", score: 15 },
+  { id: "15", name: "Alice", color: "#ff0000", score: 10 },
+  { id: "25", name: "Bob", color: "#00ff00", score: 20 },
+  { id: "35", name: "Charlie", color: "#0000ff", score: 15 },
+  { id: "16", name: "Alice", color: "#ff0000", score: 10 },
+  { id: "26", name: "Bob", color: "#00ff00", score: 20 },
+  { id: "36", name: "Charlie", color: "#0000ff", score: 15 },
+  { id: "17", name: "Alice", color: "#ff0000", score: 10 },
+  { id: "27", name: "Bob", color: "#00ff00", score: 20 },
+  { id: "37", name: "Charlie", color: "#0000ff", score: 15 },
+];
+
 export default function Room() {
   const { roomId } = useParams<{ roomId: string }>();
 
-  const { player, currentRoom, setCurrentRoom, setPlayer } = useAppContext();
+  const { player, currentRoom, setCurrentRoom, setPlayer, currentTheme } =
+    useAppContext();
 
   const [playerName, setPlayerName] = useState("");
   const [playerNameError, setPlayerNameError] = useState<string | null>(null);
@@ -51,6 +88,8 @@ export default function Room() {
     GamemodeOptions[0].value,
   );
 
+  const [selectedRounds, setSelectedRounds] = useState(RoundOptions[2].value);
+
   const audioRef = useRef<HTMLAudioElement>(null);
 
   /* ------------------- SignalR Hook ------------------- */
@@ -58,17 +97,16 @@ export default function Room() {
   const { sendChat, sendGuess } = useRoomSignalR(roomId, {
     onRoomUpdate: setCurrentRoom,
     onSongStarted: setCurrentSong,
-    onCorrectGuess: (playerId: string, newScore: number) => {
-      setCurrentRoom((prev) =>
-        prev
-          ? {
-              ...prev,
-              players: prev.players.map((p) =>
-                p.id === playerId ? { ...p, score: newScore } : p,
-              ),
-            }
-          : prev,
-      );
+    onCorrectGuess: (songName) => {
+      setCurrentSong((s) => s && { ...s, displayName: songName });
+    },
+    onRoundEnded: (correctAnswer, intermissionEndsAt) => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        console.log(intermissionEndsAt);
+      }
+      setCurrentSong((s) => s && { ...s, name: correctAnswer });
     },
     onChat: (msg) => {
       setMessages((prev) => [...prev, msg]);
@@ -110,9 +148,18 @@ export default function Room() {
     if (currentRoom) await startGame(currentRoom.id);
   }
 
+  async function onRestartGame() {
+    if (currentRoom) await restartGame(currentRoom.id);
+  }
+
   async function onChangedGamemode(value: string) {
     setSelectedGamemode(value);
     if (currentRoom) await setGamemode(currentRoom.id, value);
+  }
+
+  async function onChangedRounds(value: number) {
+    setSelectedRounds(value);
+    if (currentRoom) await setRounds(currentRoom.id, value);
   }
 
   function validateAndSetPlayerName(name: string) {
@@ -147,6 +194,10 @@ export default function Room() {
       </div>
     );
 
+  const isBright = isBrightColor(hex) && currentTheme === "light";
+
+  const shadowStyle = isBright ? { ["-webkit-text-stroke"]: "2px #000" } : {};
+
   if (!player)
     return (
       <div className="room-page">
@@ -159,7 +210,7 @@ export default function Room() {
             invalidText={playerNameError}
             maxLength={20}
             onChange={(v) => validateAndSetPlayerName(v.target.value)}
-            modifierStyle={{ color: hex }}
+            modifierStyle={{ color: hex, ...shadowStyle }}
           />
 
           <Hue
@@ -194,19 +245,53 @@ export default function Room() {
                     key={p.id}
                     player={p}
                     isHost={currentRoom.host?.id === p.id}
+                    small={currentRoom.players.length > 6}
                   />
                 ))}
               </div>
             </div>
-            {currentRoom.host?.id === player.id ? (
-              <Dropdown
-                modifierClass="gamemode-dropdown"
-                label="Modus"
-                options={GamemodeOptions}
-                onChange={(value) => onChangedGamemode(value)}
-                defaultValue={selectedGamemode}
-              />
-            ) : null}
+            <div
+              className={`settings-area ${currentRoom.host?.id === player.id ? "" : "col"}`}
+            >
+              {currentRoom.host?.id === player.id ? (
+                <Dropdown
+                  modifierClass="gamemode-dropdown"
+                  label="Modus"
+                  options={GamemodeOptions}
+                  onChange={(value) => onChangedGamemode(value as string)}
+                  defaultValue={selectedGamemode}
+                />
+              ) : (
+                <div>
+                  <h3 className="players-title">
+                    MODUS:{" "}
+                    <span>
+                      {" "}
+                      {
+                        GamemodeOptions.find(
+                          (o) => o.value === currentRoom.game?.gameMode,
+                        )?.label
+                      }
+                    </span>
+                  </h3>
+                </div>
+              )}
+              {currentRoom.host?.id === player.id ? (
+                <Dropdown
+                  modifierClass="gamemode-dropdown"
+                  label="Antall runder"
+                  options={RoundOptions}
+                  onChange={(value) => onChangedRounds(value as number)}
+                  defaultValue={selectedRounds}
+                />
+              ) : (
+                <div>
+                  <h3 className="players-title">
+                    RUNDER: <span>{currentRoom.game?.totalRounds}</span>
+                  </h3>
+                </div>
+              )}
+            </div>
             {currentRoom.host?.id === player.id ? (
               <Button
                 text={"Start spillet"}
@@ -250,48 +335,84 @@ export default function Room() {
 
         <div className="podium">
           {silver && (
-            <div className="podium-place silver">
-              <div className="medal">🥈</div>
-              <div className="name" style={{ color: silver.color }}>
-                {silver.name}
+            <div className="podium-wrapper">
+              <span className="place silver">2</span>
+              <div className="podium-place silver">
+                <Textfit mode="single" max={64} className="name">
+                  {silver.name}
+                </Textfit>
+                <Textfit mode="single" max={64} className="score silver">
+                  {silver.score}
+                </Textfit>
               </div>
-              <div className="score">{silver.score} poeng</div>
             </div>
           )}
 
           {gold && (
-            <div className="podium-place gold">
-              <div className="medal">🥇</div>
-              <div className="name" style={{ color: gold.color }}>
-                {gold.name}
+            <div className="podium-wrapper">
+              <span className="place gold">1</span>
+              <div className="podium-place gold">
+                <Textfit mode="single" max={64} className="name">
+                  {gold.name}
+                </Textfit>
+                <Textfit mode="single" max={64} className="score gold">
+                  {gold.score}
+                </Textfit>
               </div>
-              <div className="score">{gold.score} poeng</div>
             </div>
           )}
 
           {bronze && (
-            <div className="podium-place bronze">
-              <div className="medal">🥉</div>
-              <div className="name" style={{ color: bronze.color }}>
-                {bronze.name}
+            <div className="podium-wrapper">
+              <span className="place bronze">3</span>
+              <div className="podium-place bronze">
+                <Textfit mode="single" max={64} className="name">
+                  {bronze.name}
+                </Textfit>
+                <Textfit mode="single" max={64} className="score bronze">
+                  {bronze.score}
+                </Textfit>
               </div>
-              <div className="score">{bronze.score} poeng</div>
             </div>
           )}
         </div>
+        {player.id === currentRoom.host?.id && (
+          <Button
+            text={"Tilbake til lobby"}
+            onClick={onRestartGame}
+            modifierClass="restart-button"
+          />
+        )}
       </div>
     );
   }
 
   /* ------------------- Game View ------------------- */
 
+  const isPlayerGuessedCorrectly =
+    (currentRoom.game?.currentRound?.playerScores &&
+      player.id in currentRoom.game.currentRound.playerScores) ??
+    false;
+
+  const chunkSize = 10;
+
+  const playerColumns = [];
+  for (let i = 0; i < currentRoom.players.length; i += chunkSize) {
+    playerColumns.push(currentRoom.players.slice(i, i + chunkSize));
+  }
+
   return (
     <div className="game-page">
-      <div className="song-area">
-        <div className="song-mask">
-          {currentRoom.game.currentRound?.maskedName.split("").map((c, i) => (
-            <span key={i}>{c === " " ? "\u00A0\u00A0" : c}</span>
-          ))}
+      <div className={`song-area ${isPlayerGuessedCorrectly ? "correct" : ""}`}>
+        <div className={`song-mask`}>
+          {(isPlayerGuessedCorrectly && currentSong
+            ? currentSong.displayName
+            : currentRoom.game.currentRound?.maskedName) ||
+            ""
+              .split("")
+              .map((c, i) => (
+                <span key={i}>{c === " " ? "\u00A0\u00A0" : c}</span>
+              ))}
         </div>
       </div>
 
@@ -305,7 +426,10 @@ export default function Room() {
       />
 
       <div className="song-timer">
-        0:{Math.floor(currentTime).toString().padStart(2, "0")} / 0:30
+        <span>
+          {`0:${Math.floor(currentTime).toString().padStart(2, "0")} / 0:30`}
+        </span>
+        <span>{`Runde ${currentRoom.game?.currentRoundIndex + 1} / ${currentRoom.game?.totalRounds}`}</span>
       </div>
 
       <div className="progress-bar">
@@ -317,16 +441,20 @@ export default function Room() {
 
       <div className="game-area">
         <div className="game-players-area">
-          {currentRoom.players.map((p) => (
-            <PlayerCard
-              key={p.id}
-              small
-              player={p}
-              isHost={currentRoom.host?.id === p.id}
-              isCorrectGuess={
-                p.id in (currentRoom.game?.currentRound?.playerScores ?? {})
-              }
-            />
+          {playerColumns.map((column, i) => (
+            <div key={i} className="player-column">
+              {column.map((p) => (
+                <PlayerCard
+                  key={p.id}
+                  small
+                  player={p}
+                  isHost={currentRoom.host?.id === p.id}
+                  isCorrectGuess={
+                    p.id in (currentRoom.game?.currentRound?.playerScores ?? {})
+                  }
+                />
+              ))}
+            </div>
           ))}
         </div>
 
@@ -360,49 +488,51 @@ function WaveText({
   const letters = url.split("");
 
   function onCopyRoom(e: React.MouseEvent) {
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(`https://www.${url}`);
     setShowCopyTooltip(true);
     setTimeout(() => setShowCopyTooltip(false), 3000);
     setTooltipPosition({ x: e.clientX, y: e.clientY });
   }
 
   return (
-    <div
-      className="room-code"
-      style={{ display: "flex", gap: 2 }}
-      onClick={(e) => onCopyRoom(e)}
-    >
-      {letters.map((char, i) => (
-        <motion.h1
-          key={i}
-          className="room-title"
+    <div className="room-code-wrapper">
+      <div
+        className="room-code"
+        style={{ display: "flex", gap: 2 }}
+        onClick={(e) => onCopyRoom(e)}
+      >
+        {letters.map((char, i) => (
+          <motion.h1
+            key={i}
+            className="room-title"
+            animate={{ y: [0, -8, 0] }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: i * 0.1,
+            }}
+          >
+            {char}
+          </motion.h1>
+        ))}
+
+        <motion.span
+          className="material-symbols-outlined copy-icon"
           animate={{ y: [0, -8, 0] }}
           transition={{
             duration: 1.5,
             repeat: Infinity,
-            delay: i * 0.1,
+            delay: letters.length * 0.1,
           }}
         >
-          {char}
-        </motion.h1>
-      ))}
-
-      <motion.span
-        className="material-symbols-outlined copy-icon"
-        animate={{ y: [0, -8, 0] }}
-        transition={{
-          duration: 1.5,
-          repeat: Infinity,
-          delay: letters.length * 0.1,
-        }}
-      >
-        content_copy
-      </motion.span>
-      {showCopyTooltip && (
-        <Tooltip x={tooltipPosition.x} y={tooltipPosition.y}>
-          Kopiert!
-        </Tooltip>
-      )}
+          content_copy
+        </motion.span>
+        {showCopyTooltip && (
+          <Tooltip x={tooltipPosition.x} y={tooltipPosition.y}>
+            Kopiert!
+          </Tooltip>
+        )}
+      </div>
     </div>
   );
 }

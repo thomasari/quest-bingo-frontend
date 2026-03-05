@@ -5,9 +5,9 @@ interface DropdownProps {
   disabled?: boolean;
   invalidText?: string | null;
   modifierClass?: string;
-  options: { value: string; label: string }[];
-  onChange?: (value: string) => void;
-  defaultValue?: string;
+  options: { value: string | number; label: string }[];
+  onChange?: (value: string | number) => void;
+  defaultValue?: string | number;
 }
 
 function Dropdown({

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  HttpTransportType,
   HubConnection,
   HubConnectionBuilder,
   LogLevel,
@@ -10,7 +11,8 @@ import { BACKEND_API_URL } from "../globals";
 interface RoomSignalRHandlers {
   onRoomUpdate?: (room: RoomDto) => void;
   onSongStarted?: (song: SongDto) => void;
-  onCorrectGuess?: (playerId: string, newScore: number) => void;
+  onRoundEnded?: (correctAnswer: string, intermissionEndsAt: string) => void;
+  onCorrectGuess?: (songName: string) => void;
   onChat?: (message: ChatMessage) => void;
   onGameEnded?: (room: RoomDto) => void;
 }
@@ -32,10 +34,15 @@ export default function useRoomSignalR(
     if (!roomId) return;
 
     const conn = new HubConnectionBuilder()
-      .withUrl(`${BACKEND_API_URL}/hub/room?roomId=${roomId}`)
+      .withUrl(`${BACKEND_API_URL}/hub/room?roomId=${roomId}`, {
+        transport: HttpTransportType.WebSockets,
+      })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Warning)
       .build();
+
+    conn.serverTimeoutInMilliseconds = 90000;
+    conn.keepAliveIntervalInMilliseconds = 30000;
 
     connectionRef.current = conn;
 
@@ -59,8 +66,8 @@ export default function useRoomSignalR(
       handlers?.onRoomUpdate?.(state);
     });
 
-    conn.on("CorrectGuess", (playerId: string, newScore: number) => {
-      handlers?.onCorrectGuess?.(playerId, newScore);
+    conn.on("CorrectGuess", (songName: string) => {
+      handlers?.onCorrectGuess?.(songName);
     });
 
     conn.on("SongStarted", (song: SongDto) => {
@@ -68,10 +75,12 @@ export default function useRoomSignalR(
       handlers?.onSongStarted?.(song);
     });
 
-    conn.on("RoundEnded", (song: SongDto) => {
-      syncAudio(song.previewUrl, song.startAt);
-      handlers?.onSongStarted?.(song);
-    });
+    conn.on(
+      "RoundEnded",
+      (correctAnswer: string, intermissionEndsAt: string) => {
+        handlers?.onRoundEnded?.(correctAnswer, intermissionEndsAt);
+      },
+    );
 
     conn.on("GameEnded", (room: RoomDto) => {
       setRoom(room);
@@ -93,6 +102,7 @@ export default function useRoomSignalR(
       conn.off("RoomUpdate");
       conn.off("CorrectGuess");
       conn.off("SongStarted");
+      conn.off("RoundEnded");
       conn.off("GameEnded");
       conn.off("ReceiveChat");
     };

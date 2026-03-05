@@ -1,4 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@font-face {
+  font-family: "Jersey 25";
+  src: url("/fonts/Jersey25-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto";
+  src: url("/fonts/Roboto-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --bg-size: 40px;
@@ -11,6 +25,10 @@
   --tertiary: color-mix(in srgb, var(--primary) 50%, white 50%);
   --text-on-primary: #ffffff;
   --correct: #2e9e5b;
+
+  --gold: #ffcc33;
+  --silver: #b8c6cf;
+  --bronze: #c8742a;
 
   transition:
     background-color 0.2s ease,

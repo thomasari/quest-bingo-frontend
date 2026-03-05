@@ -3,6 +3,8 @@ import "./Chat.scss";
 import type { ChatMessage, Player, RoomDto } from "../../types/types";
 import Input from "../input/Input";
 import Button from "../button/Button";
+import { isBrightColor } from "../../utils/helpers";
+import { useAppContext } from "../../context/context";
 
 interface Props {
   room: RoomDto;
@@ -15,6 +17,11 @@ interface Props {
 function Chat({ room, player, messages, sendMessage, modifierClass }: Props) {
   const [newMessage, setNewMessage] = useState("");
   const chatLogRef = useRef<HTMLDivElement>(null);
+
+  const { currentTheme } = useAppContext();
+  const isBright = isBrightColor(player.color) && currentTheme === "light";
+
+  const shadowStyle = isBright ? { ["-webkit-text-stroke"]: "2px #000" } : {};
 
   /* Auto-scroll */
   useEffect(() => {
@@ -44,8 +51,15 @@ function Chat({ room, player, messages, sendMessage, modifierClass }: Props) {
     player.id in currentRound.playerScores;
 
   const disabled =
-    ((room.game?.currentRound?.state === "Playing" && hasGuessed) ?? false) ||
-    room.game?.currentRound?.state === "Intermission";
+    (room.game?.currentRound?.state === "Playing" && hasGuessed) ?? false;
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!disabled) {
+      inputRef.current?.focus();
+    }
+  }, [room.game?.currentRoundIndex, disabled]);
 
   return (
     <div className={`chat ${modifierClass ?? ""}`}>
@@ -54,10 +68,18 @@ function Chat({ room, player, messages, sendMessage, modifierClass }: Props) {
           <div
             key={i}
             className={`chat-message ${m.isSystemMessage ? "system" : ""}`}
-            style={m.isSystemMessage ? { color: m.sender.color } : {}}
+            style={
+              m.isSystemMessage ? { color: m.sender.color, ...shadowStyle } : {}
+            }
           >
             {!m.isSystemMessage && (
-              <span className="chat-sender" style={{ color: m.sender.color }}>
+              <span
+                className="chat-sender"
+                style={{
+                  color: m.sender.color,
+                  ...shadowStyle,
+                }}
+              >
                 {m.sender.name}:
               </span>
             )}
@@ -73,6 +95,7 @@ function Chat({ room, player, messages, sendMessage, modifierClass }: Props) {
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
+          ref={inputRef}
         />
 
         <Button
