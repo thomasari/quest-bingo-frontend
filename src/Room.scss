@@ -115,6 +115,11 @@
   }
 }
 
+.players-title-area {
+  display: flex;
+  gap: 2rem;
+}
+
 .players-title {
   font-family: "Jersey 25";
   font-size: 3rem;
@@ -123,8 +128,16 @@
   user-select: none;
 
   span {
-    color: var(--text);
+    color: var(--secondary);
   }
+}
+
+.players-count {
+  color: var(--text);
+  font-family: "Jersey 25";
+  font-size: 3rem;
+  margin: 0;
+  user-select: none;
 }
 
 .joining-room-title {
@@ -186,6 +199,12 @@
 .mask-letter {
   width: 16px;
   text-align: center;
+}
+
+.artist {
+  font-family: "Jersey 25", "Noto Serif", serif !important;
+  font-size: 1.5rem;
+  color: var(--text);
 }
 
 .game-area {
@@ -358,4 +377,8 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
+}
+
+.go-back-button {
+  margin-top: 6rem;
 }

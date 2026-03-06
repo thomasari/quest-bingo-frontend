@@ -8,6 +8,31 @@ import { motion } from "motion/react";
 import "./Home.scss";
 import { useNavigate } from "react-router-dom";
 
+const WaveText = () => {
+  const letters = "GJETT LÅTA".split("");
+
+  return (
+    <div style={{ display: "flex", gap: 2 }}>
+      {letters.map((char, i) => (
+        <motion.h1
+          className="title"
+          key={i}
+          animate={{
+            y: ["0%", "-10%", "0%"],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            delay: i * 0.1,
+          }}
+        >
+          {char}
+        </motion.h1>
+      ))}
+    </div>
+  );
+};
+
 export default function Home() {
   const [showHowToPlayModal, setShowHowToPlayModal] = useState(false);
   const [roomId, setRoomId] = useState("");
@@ -32,31 +57,6 @@ export default function Home() {
   async function onJoinRoom() {
     setPlayer(null);
     navigate(`/${roomId}`);
-  }
-
-  const letters = "GJETT LÅTA".split("");
-
-  function WaveText() {
-    return (
-      <div style={{ display: "flex", gap: 2 }}>
-        {letters.map((char, i) => (
-          <motion.h1
-            className="title"
-            key={i}
-            animate={{
-              y: ["0%", "-10%", "0%"],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              delay: i * 0.1,
-            }}
-          >
-            {char}
-          </motion.h1>
-        ))}
-      </div>
-    );
   }
 
   return (
@@ -107,15 +107,13 @@ export default function Home() {
             <b>Spilleregler</b>
             <p>
               Når spillet starter, vil en sang begynne å spille, og du må gjette
-              sangens tittel så raskt som mulig. Skriv inn gjetningen din i
-              chatten og send den inn. Jo raskere du gjetter riktig, desto flere
-              poeng får du!
+              sangens tittel. Skriv inn gjetningen din i chatten og send den
+              inn. Jo raskere du gjetter riktig, desto flere poeng får du!
             </p>
-            <b>Runder og poeng</b>
+            <b>Runder og modus</b>
             <p>
-              Spillet består av 16 runder, og hver runde varer i 30 sekunder.
-              Poengene dine vil bli oppdatert etter hver runde basert på hvor
-              raskt du gjetter riktig.
+              Spillet består av opptil 30 runder, og hver runde varer i 30
+              sekunder. Du vil få mer poeng jo raskere du gjetter riktig!
             </p>
             <b>Vinn spillet</b>
             <p>

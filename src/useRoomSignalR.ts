@@ -12,7 +12,7 @@ interface RoomSignalRHandlers {
   onRoomUpdate?: (room: RoomDto) => void;
   onSongStarted?: (song: SongDto) => void;
   onRoundEnded?: (correctAnswer: string, intermissionEndsAt: string) => void;
-  onCorrectGuess?: (songName: string) => void;
+  onCorrectGuess?: (songName: string, artistName: string) => void;
   onChat?: (message: ChatMessage) => void;
   onGameEnded?: (room: RoomDto) => void;
 }
@@ -66,8 +66,8 @@ export default function useRoomSignalR(
       handlers?.onRoomUpdate?.(state);
     });
 
-    conn.on("CorrectGuess", (songName: string) => {
-      handlers?.onCorrectGuess?.(songName);
+    conn.on("CorrectGuess", (songName: string, artistName: string) => {
+      handlers?.onCorrectGuess?.(songName, artistName);
     });
 
     conn.on("SongStarted", (song: SongDto) => {

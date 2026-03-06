@@ -3,6 +3,7 @@ import Button from "./components/button/Button";
 import Input from "./components/input/Input";
 import { useAppContext } from "./context/context";
 import {
+  getGamemodes,
   getRoom,
   joinRoom,
   restartGame,
@@ -17,55 +18,29 @@ import { hsvaToHexa } from "@uiw/color-convert";
 import Dropdown from "./components/dropdown/Dropdown";
 import PlayerCard from "./components/playercard/PlayerCard";
 import type { ChatMessage, SongDto } from "./types/types";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useRoomSignalR from "./useRoomSignalR";
 import { motion } from "motion/react";
 import Tooltip from "./components/tooltip/Tooltip";
 import { Textfit } from "react-textfit";
 import { isBrightColor } from "./utils/helpers";
 
-const GamemodeOptions = [
-  { value: "AllTime", label: "Alle tidsaldre" },
-  { value: "Seventies", label: "70-tallet" },
-  { value: "Eighties", label: "80-tallet" },
-  { value: "Nineties", label: "90-tallet" },
-  { value: "TwoThousands", label: "2000-tallet" },
-  { value: "TwentyTens", label: "2010-tallet" },
-  { value: "TwentyTwenties", label: "2020-tallet" },
-];
-
-const RoundOptions = [
-  { value: 5, label: "5 runder" },
-  { value: 10, label: "10 runder" },
-  { value: 15, label: "15 runder" },
-  { value: 20, label: "20 runder" },
-  { value: 25, label: "25 runder" },
-  { value: 30, label: "30 runder" },
-];
-
-const dummyPlayers = [
-  { id: "1", name: "Alice", color: "#ff0000", score: 10 },
-  { id: "2", name: "Bob", color: "#00ff00", score: 20 },
-  { id: "3", name: "Charlie", color: "#0000ff", score: 15 },
-  { id: "12", name: "Alice", color: "#ff0000", score: 10 },
-  { id: "23", name: "Bob", color: "#00ff00", score: 20 },
-  { id: "34", name: "Charlie", color: "#0000ff", score: 15 },
-  { id: "15", name: "Alice", color: "#ff0000", score: 10 },
-  { id: "25", name: "Bob", color: "#00ff00", score: 20 },
-  { id: "35", name: "Charlie", color: "#0000ff", score: 15 },
-  { id: "16", name: "Alice", color: "#ff0000", score: 10 },
-  { id: "26", name: "Bob", color: "#00ff00", score: 20 },
-  { id: "36", name: "Charlie", color: "#0000ff", score: 15 },
-  { id: "17", name: "Alice", color: "#ff0000", score: 10 },
-  { id: "27", name: "Bob", color: "#00ff00", score: 20 },
-  { id: "37", name: "Charlie", color: "#0000ff", score: 15 },
-];
+const RoundOptions = [5, 10, 15, 20, 25, 30];
 
 export default function Room() {
   const { roomId } = useParams<{ roomId: string }>();
 
-  const { player, currentRoom, setCurrentRoom, setPlayer, currentTheme } =
-    useAppContext();
+  const {
+    player,
+    currentRoom,
+    setCurrentRoom,
+    setPlayer,
+    currentTheme,
+    setGameModes,
+    gameModes,
+  } = useAppContext();
+
+  const navigate = useNavigate();
 
   const [playerName, setPlayerName] = useState("");
   const [playerNameError, setPlayerNameError] = useState<string | null>(null);
@@ -84,11 +59,9 @@ export default function Room() {
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const [selectedGamemode, setSelectedGamemode] = useState(
-    GamemodeOptions[0].value,
-  );
+  const [selectedGamemode, setSelectedGamemode] = useState("AllTime");
 
-  const [selectedRounds, setSelectedRounds] = useState(RoundOptions[2].value);
+  const [selectedRounds, setSelectedRounds] = useState(RoundOptions[2]);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -97,8 +70,10 @@ export default function Room() {
   const { sendChat, sendGuess } = useRoomSignalR(roomId, {
     onRoomUpdate: setCurrentRoom,
     onSongStarted: setCurrentSong,
-    onCorrectGuess: (songName) => {
-      setCurrentSong((s) => s && { ...s, displayName: songName });
+    onCorrectGuess: (songName, artistName) => {
+      setCurrentSong(
+        (s) => s && { ...s, displayName: songName, artistName: artistName },
+      );
     },
     onRoundEnded: (correctAnswer, intermissionEndsAt) => {
       if (audioRef.current) {
@@ -129,6 +104,20 @@ export default function Room() {
 
     if (!currentRoom) fetchRoom();
   }, [currentRoom, roomId, setCurrentRoom]);
+
+  /* ------------------- Fetch gamemodes ------------------- */
+  useEffect(() => {
+    async function fetchGamemodes() {
+      try {
+        const gamemodes = await getGamemodes();
+        setGameModes(gamemodes);
+      } catch (error) {
+        console.error("Error fetching gamemodes:", error);
+      }
+    }
+
+    fetchGamemodes();
+  }, [setGameModes]);
 
   /* ------------------- Handlers ------------------- */
 
@@ -190,7 +179,13 @@ export default function Room() {
   if (!currentRoom)
     return (
       <div className="room-page">
-        <h2>Fant ikke rommet med id {roomId}</h2>
+        <h1 className="room-title">{roomId}</h1>
+        <h2 className="color-title">Fant ikke rommet!</h2>
+        <Button
+          modifierClass="go-back-button"
+          text="Gå tilbake"
+          onClick={() => navigate("/")}
+        />
       </div>
     );
 
@@ -238,7 +233,13 @@ export default function Room() {
         <div className="lobby-page">
           <div className="lobby">
             <div className="players-area">
-              <h3 className="players-title">SPILLERE</h3>
+              <div className="players-title-area">
+                <h3 className="players-title">SPILLERE</h3>
+                <span className="players-count">
+                  {currentRoom.players.length} / {currentRoom.maxPlayers}
+                </span>
+              </div>
+
               <div className="players">
                 {currentRoom.players.map((p) => (
                   <PlayerCard
@@ -257,7 +258,7 @@ export default function Room() {
                 <Dropdown
                   modifierClass="gamemode-dropdown"
                   label="Modus"
-                  options={GamemodeOptions}
+                  options={gameModes}
                   onChange={(value) => onChangedGamemode(value as string)}
                   defaultValue={selectedGamemode}
                 />
@@ -268,7 +269,7 @@ export default function Room() {
                     <span>
                       {" "}
                       {
-                        GamemodeOptions.find(
+                        gameModes.find(
                           (o) => o.value === currentRoom.game?.gameMode,
                         )?.label
                       }
@@ -280,7 +281,10 @@ export default function Room() {
                 <Dropdown
                   modifierClass="gamemode-dropdown"
                   label="Antall runder"
-                  options={RoundOptions}
+                  options={RoundOptions.map((r) => ({
+                    value: r,
+                    label: `${r} runder`,
+                  }))}
                   onChange={(value) => onChangedRounds(value as number)}
                   defaultValue={selectedRounds}
                 />
@@ -406,8 +410,10 @@ export default function Room() {
       <div className={`song-area ${isPlayerGuessedCorrectly ? "correct" : ""}`}>
         <div className={`song-mask`}>
           {(isPlayerGuessedCorrectly && currentSong
-            ? currentSong.displayName
-            : currentRoom.game.currentRound?.maskedName) ||
+            ? `${currentSong.displayName} - ${currentSong.artistName}`
+            : currentRoom?.game?.currentRound?.state == "Playing"
+              ? currentRoom.game.currentRound?.maskedName
+              : `${currentRoom.game.currentRound?.maskedName} - ${currentSong?.artistName}`) ||
             ""
               .split("")
               .map((c, i) => (

@@ -1,6 +1,7 @@
 export interface RoomDto {
   id: string;
   players: Player[];
+  maxPlayers: number;
   host: Player | null;
   game: GameDto | null;
 }
@@ -25,6 +26,7 @@ export interface RoundDto {
 
 export interface SongDto {
   displayName: string;
+  artistName: string;
   previewUrl: string;
   startAt: string;
   endsAt: string;

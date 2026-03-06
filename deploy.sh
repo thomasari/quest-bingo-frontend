@@ -11,7 +11,7 @@ if [[ "$1" == "--force" ]]; then
 fi
 
 echo "Building frontend..."
-npm run build
+npm run build -- --mode production
 
 echo "Deploying with rsync..."
 

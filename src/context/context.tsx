@@ -16,6 +16,8 @@ type ContextType = {
   setPlayer: Dispatch<SetStateAction<Player | null>>;
   isLoading: boolean;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
+  gameModes: { value: string; label: string }[];
+  setGameModes: Dispatch<SetStateAction<{ value: string; label: string }[]>>;
 };
 
 const Context = createContext<ContextType>({} as ContextType);
@@ -29,6 +31,10 @@ import type { ReactNode } from "react";
 import type { Player, RoomDto } from "../types/types";
 
 export default function ContextProvider({ children }: { children: ReactNode }) {
+  const [gameModes, setGameModes] = useState<
+    { value: string; label: string }[]
+  >([]);
+
   function applyTheme() {
     let theme = sessionStorage.getItem("theme");
 
@@ -78,6 +84,8 @@ export default function ContextProvider({ children }: { children: ReactNode }) {
         setPlayer,
         isLoading,
         setIsLoading,
+        gameModes,
+        setGameModes,
       }}
     >
       {children}

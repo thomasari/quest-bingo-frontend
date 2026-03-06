@@ -86,6 +86,25 @@ export async function startGame(roomId: string): Promise<RoomDto | null> {
 }
 
 /* ============================= */
+/* GET GAMEMODES */
+/* ============================= */
+
+export async function getGamemodes(): Promise<
+  { value: string; label: string }[]
+> {
+  try {
+    const res = await fetch(`${BACKEND_API_URL}/gamemodes`);
+    if (!res.ok) throw new Error("Failed to fetch gamemodes");
+
+    const gamemodes: { value: string; label: string }[] = await res.json();
+    return gamemodes;
+  } catch (err) {
+    console.error("Failed to fetch gamemodes:", err);
+    return [];
+  }
+}
+
+/* ============================= */
 /* SET GAMEMODE */
 /* ============================= */
 
